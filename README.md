@@ -1,9 +1,3 @@
-
-
-
-
-
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -27,6 +21,7 @@
             background-color: #000;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            line-height: 1.8; /* Aumenta o espaçamento entre as linhas */
         }
         #output {
             white-space: pre-line;
@@ -64,6 +59,20 @@
         ];
 
         let index = 0;
+        let typingInterval = 50; // Velocidade de digitação (em milissegundos)
+
+        // Função para exibir as letras uma por uma
+        function typeMessage(message, element, callback) {
+            let i = 0;
+            let interval = setInterval(() => {
+                element.innerHTML += message[i];
+                i++;
+                if (i >= message.length) {
+                    clearInterval(interval);
+                    if (callback) callback(); // Chama o callback ao final da digitação
+                }
+            }, typingInterval);
+        }
 
         input.addEventListener("keypress", function(event) {
             if (event.key === "Enter") {
@@ -71,16 +80,23 @@
                 input.value = ""; // Limpar a entrada
 
                 if (resposta === 's' && index < mensagens.length) {
-                    output.innerHTML += `\n${mensagens[index]}`;
-                    index++;
+                    output.innerHTML += `\n`; // Adiciona uma nova linha
+                    typeMessage(mensagens[index], output, () => {
+                        index++;
+                    });
                 } else if (resposta === 'n') {
-                    output.innerHTML += "\nTudo bem, talvez em outro momento você esteja mais disposta a ouvir...";
-                    input.disabled = true; // Desativa a entrada
+                    output.innerHTML += "\n";
+                    typeMessage("Tudo bem, talvez em outro momento você esteja mais disposta a ouvir...", output, () => {
+                        input.disabled = true; // Desativa a entrada
+                    });
                 } else if (index >= mensagens.length) {
-                    output.innerHTML += "\nObrigado por ler até aqui!";
-                    input.disabled = true; // Desativa a entrada
+                    output.innerHTML += "\n";
+                    typeMessage("Obrigado por ler até aqui!", output, () => {
+                        input.disabled = true; // Desativa a entrada
+                    });
                 } else {
-                    output.innerHTML += "\nResposta inválida. Tente novamente.";
+                    output.innerHTML += "\n";
+                    typeMessage("Resposta inválida. Tente novamente.", output);
                 }
 
                 // Rolar para o fim do terminal
